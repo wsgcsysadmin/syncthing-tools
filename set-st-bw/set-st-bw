@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Copyright 2015 Williamson Street Grocery Cooperative
+#
+# This is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License version 3 as published by the Free
+# Software Foundation.
+#
+# Requires:
+# jq - https://stedolan.github.io/jq/
+# curl
+
+## Configurables:
+#CONFIGFILE=/etc/syncthing/set-st-bw.cfg
+CONFIGFILE=/etc/syncthing/set-st-bw.cfg
+JQPATH=`which jq`
+CURLPATH=`which curl`
+##
+
+function bail()
+{
+  echo ERROR: "$*"
+  exit 1
+}
+
+if [ "$#" -ne 2 ] ; then
+  bail "USAGE: $0 [down rate] [up rate]"
+fi
+
+if [ ! -r "$CONFIGFILE" ] ; then
+  bail "Unable to read configuration: $CONFIGFILE"
+fi
+
+. $CONFIGFILE
+DOWN=$1
+UP=$2
+
+tmpcfg1=`tempfile`
+tmpcfg2=`tempfile`
+cooks=`tempfile`
+
+CMD="$CURLPATH --cookie-jar $cooks  $INSECURE -s "
+if [ "$VERBOSE" -eq 1 ] ; then
+  CMD="$CMD -v "
+fi
+
+
+$CMD -o $tmpcfg1 $URL/rest/system/config \
+  || bail "CURL error $?. Unable to download config"
+
+$JQPATH -s  ".[].options.maxRecvKbps=$DOWN|.[].options.maxSendKbps=$UP|.[0]"  $tmpcfg1 > $tmpcfg2 \
+  || bail "Unable to alter JSON config"
+
+$CMD -d @$tmpcfg2 -H "X-API-Key: $APIKEY"  $URL/rest/system/config \
+  || bail "CURL error $?. Unable to update JSON config on server" 
+
+res=`$CMD -d '' -H "X-API-Key: $APIKEY"  $URL/rest/system/restart ` \
+  || bail "CURL error $?. Unable to update JSON config on server" 
+
+[ "$VERBOSE" -eq 1 ] && echo RESULT=$res
+
+rm -f $tmpcfg1 $tmpcfg2 $cooks
+
+

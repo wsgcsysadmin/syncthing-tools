@@ -1,0 +1,7 @@
+# URL=https://someserver:8384
+URL=https://USER:PASS@backup-svr:8384
+APIKEY="SUPERSECRET"
+# uncomment this line to disable certificate checking in curl
+#INSECURE="--insecure"
+VERBOSE=0
+
