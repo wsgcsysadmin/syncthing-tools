@@ -1,7 +1,8 @@
 # URL=https://someserver:8384
 URL=https://USER:PASS@backup-svr:8384
 APIKEY="SUPERSECRET"
-# uncomment this line to disable certificate checking in curl
-#INSECURE="--insecure"
-VERBOSE=0
+
+# Enables curl's --insecure option where SSL certificates are 
+# not verified against any CA. Use for self-signed certs.
+INSECURE=1
 
