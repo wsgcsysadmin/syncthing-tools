@@ -57,7 +57,7 @@ def main():
 
   parser = OptionParser(usage="%prog [-c CONFIGFILE] [-x SECTION]  [-n] [-r MAX_RECV] [-s MAX_SEND]")
   parser.add_option("-x", "--conf-section", action="store", dest="section",help="Name of the configuration section to use for connection parameters.",default="localhost")
-  parser.add_option("-c", "--config-file", action="store", dest="config_path",help="Path to configuration file.",default="/etc/syncthing/set-st-bw.cfg")
+  parser.add_option("-c", "--config-file", action="store", dest="config_path",help="Path to configuration file.",default="/etc/syncthing/set-st-bw.conf")
   parser.add_option("-n", "--no-change", action="store_true", dest="no_change",help="Make no changes, only print the current settings.")
   parser.add_option("-r", "--max-recv", action="store", dest="max_recv",help="Set maxRecvKbps. Not required if -n is used.")
   parser.add_option("-s", "--max-send", action="store", dest="max_send",help="Set maxSendKbps. Not required if -n is used.")
