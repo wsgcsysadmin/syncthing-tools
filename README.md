@@ -23,9 +23,25 @@ apikey=SECRETSAUCE
 # If set to 1 SSL certificates are not verified against any CA. 
 # Use for self-signed certs like those that Syncthing uses by default.
 insecure=True
+
+[remotehost]
+url=https://USER:PASSWORD@remotehost:8384
+apikey=UNKNOWNADDITIVES
+# If set to 1 SSL certificates are not verified against any CA. 
+# Use for self-signed certs like those that Syncthing uses by default.
+insecure=True
 ```
 The defaul configuration location is hard coded in the script to 
 /etc/syncthing/set-st-bw.cfg. Override it with the -c command line option.
+
+### Running via CRON
+
+Example:
+```
+30 22  * * * root /path/to/set-st-bw.py -x remotehost -r 2000 -s 2000 
+0   5  * * * root /path/to/set-st-bw.py -x remotehost -r 500 -s 500
+```
+
 
 ### Usage
 ```
