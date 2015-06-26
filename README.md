@@ -2,30 +2,46 @@
 Supplemental tools for Syncthing
 
 ## set-st-bw
-This is a bash script to modify the traffic shaping on a Syncthing server using the
-REST API.  It was written for altering Syncthing's trafic shaping on a schedule using CRON.
+This is a python script to modify the traffic shaping on a Syncthing server 
+using the REST API.  It was written for altering Syncthing's trafic shaping on a
+schedule using CRON.
 
 ### Requires
-* jq - https://stedolan.github.io/jq/
-* curl
+* Python 2.7+
+  * optparse
+  * ConfigParser
+  * requests , probably > 2.0
+  * json
 
 
 ### Configuration
 A minimal configuation file:
 ```
-URL=https://USER:PASS@backup-svr:8384
-APIKEY="SUPERSECRET"
-# Use if you are using self-signed certificates
-#INSECURE=1
+[localhost]
+url=https://localhost:8384
+apikey=SECRETSAUCE
+# If set to 1 SSL certificates are not verified against any CA. 
+# Use for self-signed certs like those that Syncthing uses by default.
+insecure=True
 ```
-The defaul configuration location is hard coded in the script to /etc/syncthing/set-st-bw.cfg. Override it with the -c command line option.
+The defaul configuration location is hard coded in the script to 
+/etc/syncthing/set-st-bw.cfg. Override it with the -c command line option.
 
 ### Usage
 ```
-USAGE: ./set-st-bw -nv -c CONFIGFILE -d DOWN-RATE -u UP-RATE 
-  -c Path to configuration file.
-  -n Make no changes, only print the current settings.
-  -d Set maxRecvKbps. Not required if -n is used.
-  -u Set maxSendKbps. Not required if -n is used.
-  -v Verbose output. Useful only for troubleshooting.
+Usage: set-st-bw.py [-c CONFIGFILE] [-x SECTION]  [-n] [-r MAX_RECV] [-s MAX_SEND]
+
+Options:
+  -h, --help            show this help message and exit
+  -x SECTION, --conf-section=SECTION
+                        Name of the configuration section to use for
+                        connection parameters.
+  -c CONFIG_PATH, --config-file=CONFIG_PATH
+                        Path to configuration file.
+  -n, --no-change       Make no changes, only print the current settings.
+  -r MAX_RECV, --max-recv=MAX_RECV
+                        Set maxRecvKbps. Not required if -n is used.
+  -s MAX_SEND, --max-send=MAX_SEND
+                        Set maxSendKbps. Not required if -n is used.
+
 ```
