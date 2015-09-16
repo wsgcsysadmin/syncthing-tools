@@ -25,7 +25,9 @@ apikey=SECRETSAUCE
 insecure=True
 
 [remotehost]
-url=https://USER:PASSWORD@remotehost:8384
+url=https://remotehost:8384
+username=USER
+password=PASSWORD
 apikey=UNKNOWNADDITIVES
 # If set to 1 SSL certificates are not verified against any CA. 
 # Use for self-signed certs like those that Syncthing uses by default.
