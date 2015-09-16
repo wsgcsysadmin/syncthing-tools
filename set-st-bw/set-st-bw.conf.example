@@ -6,7 +6,9 @@ apikey=SECRETSAUCE
 insecure=True
 
 [backup-server]
-url=https://USER:PASSWORD@backup-server:8384
+url=https://backup-server:8384
+username=USER
+password=PASSWORD
 apikey=OBSCUREDRESSING
 insecure=False
 

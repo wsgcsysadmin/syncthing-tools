@@ -19,8 +19,9 @@ import ConfigParser
 import requests
 import json
 
-def get_st_config(url,verify_cert):
-  r = requests.get(url+'/rest/system/config',verify=verify_cert)
+def get_st_config(url,credentials,verify_cert):
+  r = requests.get(url+'/rest/system/config',verify=verify_cert,
+    auth=credentials)
   if r.status_code != 200:
     bail("Unable to retrieve config. "+r.text+"\nHTTP response code: " + str(r.status_code))
   return json.loads(r.text)
@@ -33,14 +34,16 @@ def set_max_send(config,max_send):
   config['options']['maxSendKbps'] = int(max_send)
   return config
   
-def put_st_config(url,verify_cert,config,apikey):
+def put_st_config(url,credentials,verify_cert,config,apikey):
   r = requests.post(url+'/rest/system/config',verify=verify_cert,
+    auth=credentials,
     headers={'X-API-Key': apikey} , data=json.dumps(config))
   if r.status_code != 200:
     bail("Unable to update config. "+r.text+"\nHTTP response code: " + str(r.status_code))
 
-def restart_st(url,verify_cert,apikey):
+def restart_st(url,credentials,verify_cert,apikey):
   r = requests.post(url+'/rest/system/restart',verify=verify_cert,
+    auth=credentials,
     headers={'X-API-Key': apikey} , data='')
   if r.status_code != 200:
     bail("Unable to restart Syncthing. "+r.text+"\nHTTP response code: " + str(r.status_code))
@@ -72,17 +75,20 @@ def main():
   if not os.access( options.config_path, os.R_OK):
     bail("Unable to read config file. Permissions? ")
 
-  config = ConfigParser.RawConfigParser({'insecure':0})
+  config = ConfigParser.RawConfigParser({'insecure':0,'username':'','password':''})
   config.read(options.config_path)
   
   if not config.has_section(options.section):
     bail("There is no section in the configuration named '"+options.section+"'")
 
   url = config.get( options.section, 'url')
+  username = config.get( options.section, 'username')
+  password = config.get( options.section, 'password')
+  creds = (username,password)
   apikey = config.get(options.section, 'apikey')  
   verify_cert = False if config.get(options.section, 'insecure' )=='True' else True
   
-  config = get_st_config( url,verify_cert)
+  config = get_st_config( url,creds,verify_cert)
 
   if options.no_change:
     print( 'maxSendKbps: '+ str(config['options']['maxSendKbps']) )
@@ -92,8 +98,8 @@ def main():
       config = set_max_recv(config,options.max_recv)
     if options.max_send is not None:
       config = set_max_send(config,options.max_send)    
-    put_st_config(url,verify_cert,config,apikey)
-    restart_st(url, verify_cert, apikey)
+    put_st_config(url,creds,verify_cert,config,apikey)
+    restart_st(url, creds, verify_cert, apikey)
   
 if __name__ == "__main__":
     main()
