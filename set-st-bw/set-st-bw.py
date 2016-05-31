@@ -19,9 +19,10 @@ import ConfigParser
 import requests
 import json
 
-def get_st_config(url,credentials,verify_cert):
+def get_st_config(url,credentials,verify_cert,apikey):
   r = requests.get(url+'/rest/system/config',verify=verify_cert,
-    auth=credentials)
+    auth=credentials,
+    headers={'X-API-Key': apikey})
   if r.status_code != 200:
     bail("Unable to retrieve config. "+r.text+"\nHTTP response code: " + str(r.status_code))
   return json.loads(r.text)
@@ -88,7 +89,7 @@ def main():
   apikey = config.get(options.section, 'apikey')
   verify_cert = False if config.get(options.section, 'insecure' )=='True' else True
 
-  config = get_st_config( url,creds,verify_cert)
+  config = get_st_config( url,creds,verify_cert,apikey)
 
   if options.no_change:
     print( 'maxSendKbps: '+ str(config['options']['maxSendKbps']) )
