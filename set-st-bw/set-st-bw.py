@@ -17,6 +17,8 @@ import sys
 from optparse import OptionParser
 import ConfigParser
 import requests
+if requests.__version__ >= '2.4':
+  import requests.packages.urllib3
 import json
 
 def get_st_config(url,credentials,verify_cert,apikey):
@@ -87,7 +89,13 @@ def main():
   password = config.get( options.section, 'password')
   creds = (username,password)
   apikey = config.get(options.section, 'apikey')
-  verify_cert = False if config.get(options.section, 'insecure' )=='True' else True
+
+  if config.get(options.section, 'insecure' )=='True':
+    verify_cert = False
+    if requests.__version__ >= '2.4':
+      requests.packages.urllib3.disable_warnings()
+  else: 
+    verify_cert = True
 
   config = get_st_config( url,creds,verify_cert,apikey)
 
