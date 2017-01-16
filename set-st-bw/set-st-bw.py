@@ -61,10 +61,11 @@ def bail(msg):
 
 def main():
 
-  parser = OptionParser(usage="%prog [-c CONFIGFILE] [-x SECTION]  [-n] [-r MAX_RECV] [-s MAX_SEND]")
+  parser = OptionParser(usage="%prog [-e] [-c CONFIGFILE] [-x SECTION]  [-n] [-r MAX_RECV] [-s MAX_SEND]")
   parser.add_option("-x", "--conf-section", action="store", dest="section",help="Name of the configuration section to use for connection parameters.",default="localhost")
   parser.add_option("-c", "--config-file", action="store", dest="config_path",help="Path to configuration file.",default="/etc/syncthing/set-st-bw.conf")
   parser.add_option("-n", "--no-change", action="store_true", dest="no_change",help="Make no changes, only print the current settings.")
+  parser.add_option("-e", "--restart", action="store_true", dest="restart",help="Restart Syncthing after changes have been made. For Syncthing < v0.14.19.")
   parser.add_option("-r", "--max-recv", action="store", dest="max_recv",help="Set maxRecvKbps. Not required if -n is used.")
   parser.add_option("-s", "--max-send", action="store", dest="max_send",help="Set maxSendKbps. Not required if -n is used.")
   #parser.add_option("-v", "--verbose", action="count", dest="verbose",help="Verbose output. Use more than once for more noise.")
@@ -94,7 +95,7 @@ def main():
     verify_cert = False
     if requests.__version__ >= '2.4':
       requests.packages.urllib3.disable_warnings()
-  else: 
+  else:
     verify_cert = True
 
   config = get_st_config( url,creds,verify_cert,apikey)
@@ -108,7 +109,8 @@ def main():
     if options.max_send is not None:
       config = set_max_send(config,options.max_send)
     put_st_config(url,creds,verify_cert,config,apikey)
-    restart_st(url, creds, verify_cert, apikey)
+    if options.restart:
+      restart_st(url, creds, verify_cert, apikey)
 
 if __name__ == "__main__":
     main()
