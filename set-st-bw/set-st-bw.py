@@ -20,6 +20,7 @@ import requests
 if requests.__version__ >= '2.4':
   import requests.packages.urllib3
 import json
+from distutils.version import StrictVersion
 
 def get_st_config(url,credentials,verify_cert,apikey):
   r = requests.get(url+'/rest/system/config',verify=verify_cert,
@@ -93,8 +94,8 @@ def main():
 
   if config.get(options.section, 'insecure' )=='True':
     verify_cert = False
-    if requests.__version__ >= '2.4':
-      requests.packages.urllib3.disable_warnings()
+    if StrictVersion(requests.__version__) >= StrictVersion('2.4'):
+      requests.packages.urllib3.disable_warnings( requests.packages.urllib3.exceptions.InsecureRequestWarning )
   else:
     verify_cert = True
 
